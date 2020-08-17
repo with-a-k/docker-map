@@ -4,6 +4,7 @@ import time
 from flask import Flask, jsonify, request, render_template
 import sys
 import requests
+import json
 
 es = Elasticsearch(host='es')
 
@@ -11,9 +12,9 @@ app = Flask(__name__)
 
 def load_data_in_es():
     """ creates an index in elasticsearch """
-    url = "http://data.sfgov.org/resource/rqzj-sfat.json"
-    r = requests.get(url)
-    data = r.json()
+    with open('rqzj-sfat.json', 'r') as dfile:
+        raw = dfile.read()
+    data = json.loads(raw) #read the local json file
     print("Loading data in elasticsearch ...")
     for id, truck in enumerate(data):
         res = es.index(index="sfdata", doc_type="truck", id=id, body=truck)
